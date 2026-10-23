@@ -1,0 +1,36 @@
+@startuml
+title Secuencia 1 - Asignar turno (BORRADOR, sujeto al diagrama de clases)
+actor Recepcionista
+participant ":ControladorTurnos" as C
+participant ":Mascota" as M
+participant ":Dueño" as D
+participant ":Veterinario" as V
+participant ":Agenda" as A
+participant ":Turno" as T
+
+Recepcionista -> C : asignarTurno(idMascota, matricula, fechaHora, tipoAtencion)
+C -> M : getDueño()
+M --> C : dueño
+C -> D : requiereSena()
+D --> C : boolean
+
+alt el dueño debe seña y no la abonó
+  C --> Recepcionista : SenaPendienteException
+else sin restricciones
+  C -> V : estaDisponible(fechaHora, tipoAtencion)
+  V -> V : dentroDeHorario(fechaHora, duracion)
+  V -> A : haySuperposicion(fechaHora, duracion)
+  A --> V : boolean
+  V --> C : boolean
+  alt profesional disponible
+    C -> V : agendarTurno(mascota, fechaHora, tipoAtencion)
+    V -> A : agregarTurno(mascota, fechaHora, tipoAtencion)
+    A -> T : <<create>> Turno(...)
+    A --> V : turno
+    V --> C : turno
+    C --> Recepcionista : turno confirmado
+  else fuera de horario o superpuesto
+    C --> Recepcionista : HorarioNoDisponibleException
+  end
+end
+@enduml
