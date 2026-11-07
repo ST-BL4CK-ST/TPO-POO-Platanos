@@ -1,0 +1,299 @@
+@startuml
+title Diagrama de clases actualizado — Etapa 2 — Veterinaria Patitas
+skinparam classAttributeIconSize 0
+hide empty members
+
+package tiempo {
+  enum DiaSemana
+  class Fecha implements Comparable {
+    - dia : int
+    - mes : int
+    - anio : int
+    + sumarDias(cantidad:int) : Fecha
+    + diasHasta(otra:Fecha) : int
+    + getDiaSemana() : DiaSemana
+    + compareTo(otra:Fecha) : int
+  }
+  class Hora implements Comparable {
+    - hora : int
+    - minuto : int
+    + aMinutos() : int
+    + compareTo(otra:Hora) : int
+  }
+  class FechaHora implements Comparable {
+    - fecha : Fecha
+    - hora : Hora
+    + sumarMinutos(minutos:int) : FechaHora
+    + minutosHasta(otra:FechaHora) : int
+    + compareTo(otra:FechaHora) : int
+  }
+  class TramoHorario {
+    - horaInicio : Hora
+    - horaFin : Hora
+    + contiene(inicio:FechaHora, duracion:int) : boolean
+  }
+}
+
+package personas {
+  abstract class Persona {
+    # nombre : String
+    # apellido : String
+    # documento : String
+    # telefono : String
+  }
+  abstract class PersonalClinica {
+    # legajo : String
+  }
+  class Recepcionista
+  class Administrador
+  class Veterinario {
+    - matricula : String
+    - especialidad : String
+    - horarioAtencion : Map<DiaSemana,TramoHorario>
+    + dentroDeHorario(fechaHora:FechaHora, duracion:int) : boolean
+    + estaDisponible(fechaHora:FechaHora, atencion:Atencion) : boolean
+  }
+  class Duenio {
+    - correoElectronico : String
+    - planSaludAnimal : boolean
+    - ausenciasConsecutivas : int
+    - senaPendiente : boolean
+    + incrementarAusencia() : void
+    + resetAusencias() : void
+    + requiereSena() : boolean
+  }
+  Persona <|-- PersonalClinica
+  Persona <|-- Duenio
+  PersonalClinica <|-- Recepcionista
+  PersonalClinica <|-- Administrador
+  PersonalClinica <|-- Veterinario
+}
+
+package mascotas {
+  abstract class Mascota {
+    # id : String
+    # nombre : String
+    # especie : String
+    # raza : String
+    # sexo : Sexo
+    # fechaNacimiento : Fecha
+    # pesoActual : double
+    + getEdadEnSemanas(fecha:Fecha) : int
+    + transferir(nuevo:Duenio, fecha:Fecha) : void
+    + getDatosEspecie() : Map<String,Object>
+  }
+  class Perro
+  class Gato
+  class Ave
+  class Conejo
+  class TransferenciaMascota
+  enum Sexo
+  enum TamanoPerro
+  enum TipoPelaje
+  Mascota <|-- Perro
+  Mascota <|-- Gato
+  Mascota <|-- Ave
+  Mascota <|-- Conejo
+  Duenio "1" -- "0..*" Mascota
+  Mascota "1" *-- "0..*" TransferenciaMascota
+}
+
+package turnos {
+  abstract class Atencion {
+    - arancel : double
+    + getArancel() : double
+    + getNombre() : String
+    + getDuracionMinutos() : int
+  }
+  class ConsultaGeneral
+  class Vacunacion
+  class Cirugia
+  Atencion <|-- ConsultaGeneral
+  Atencion <|-- Vacunacion
+  Atencion <|-- Cirugia
+
+  enum EstadoTurno
+  class Turno implements Comparable {
+    - id : String
+    - fechaHora : FechaHora
+    - estado : EstadoTurno
+    - urgencia : boolean
+    - cargoCancelacion : double
+    + reprogramar(nueva:FechaHora) : void
+    + cancelar(momento:FechaHora) : void
+    + marcarAusente() : void
+    + marcarAtendido() : void
+  }
+  class Agenda {
+    - turnos : List<Turno>
+    + haySuperposicion(inicio:FechaHora, duracion:int, ignorar:Turno) : boolean
+    + agregarTurno(mascota:Mascota, fechaHora:FechaHora, atencion:Atencion, urgencia:boolean) : Turno
+    + getPrimerHuecoLibre(desde:FechaHora, duracion:int) : FechaHora
+  }
+  class ControladorTurnos {
+    - guardiasPorFecha : Map<String,Veterinario>
+    + asignarTurno(...) : Turno
+    + reprogramarTurno(...) : void
+    + cancelarTurno(...) : void
+    + asignarGuardia(...) : void
+    + asignarUrgencia(...) : Turno
+  }
+  Veterinario "1" *-- "1" Agenda
+  Agenda "1" *-- "0..*" Turno
+  Turno "0..*" --> "1" Mascota
+  Turno "0..*" --> "1" Veterinario
+  Turno "0..*" --> "1" Atencion
+}
+
+package stock {
+  class Producto implements Comparable {
+    - codigo : String
+    - nombre : String
+    - stockMinimo : int
+    - proveedor : String
+    - precioUnitario : double
+    + getStockTotal(fecha:Fecha) : int
+    + descontarFIFO(cantidad:int, fecha:Fecha) : String
+  }
+  class Lote implements Comparable {
+    - codigo : String
+    - cantidad : int
+    - fechaVencimiento : Fecha
+    + estaVencido(fecha:Fecha) : boolean
+    + descontar(cantidad:int) : void
+  }
+  interface IServicioStock {
+    + verificarStock(consulta:Consulta, fecha:Fecha) : void
+    + descontarStock(consulta:Consulta, fecha:Fecha) : void
+    + getProductosBajoMinimo(fecha:Fecha) : List<Producto>
+  }
+  class ServicioStock
+  IServicioStock <|.. ServicioStock
+  Producto "1" *-- "0..*" Lote
+}
+
+package historia {
+  enum EstadoConsulta
+  class Consulta {
+    - motivo : String
+    - pesoDelDia : double
+    - diagnostico : String
+    - observaciones : String
+    - estado : EstadoConsulta
+    + registrarDatos(...) : void
+    + agregarTratamiento(...) : void
+    + agregarVacuna(...) : void
+    + validarParaConfirmar() : void
+    + confirmar() : void
+  }
+  class Tratamiento {
+    - dosis : String
+    - frecuencia : String
+    - duracion : String
+    - cantidad : int
+  }
+  class VacunaDefinicion {
+    - nombre : String
+    - edadMinimaSemanas : int
+    - intervaloDiasRefuerzo : int
+    - producto : Producto
+  }
+  class VacunaAplicada {
+    - lote : String
+    - fechaAplicacion : Fecha
+    - fechaProximoRefuerzo : Fecha
+  }
+  class NotaRectificatoria
+  class ControladorConsultas {
+    - servicioStock : IServicioStock
+    - controladorFacturacion : ControladorFacturacion
+    + crearConsulta(...) : Consulta
+    + registrarDatosClinicos(...) : void
+    + agregarTratamiento(...) : void
+    + aplicarVacuna(...) : void
+    + confirmarConsulta(...) : Factura
+  }
+  class ServicioRecordatoriosVacunas
+  Mascota "1" *-- "0..*" Consulta
+  Consulta "1" *-- "0..*" Tratamiento
+  Consulta "1" *-- "0..*" VacunaAplicada
+  Consulta "1" *-- "0..*" NotaRectificatoria
+  Tratamiento "0..*" --> "1" Producto
+  VacunaAplicada "0..*" --> "1" VacunaDefinicion
+  VacunaDefinicion "0..*" --> "1" Producto
+  ControladorConsultas --> IServicioStock
+}
+
+package facturacion {
+  enum MedioPago
+  enum EstadoFactura {
+    PENDIENTE
+    EMITIDA
+    ANULADA
+  }
+  interface ICalculadorDescuento {
+    + calcularDescuento(...) : double
+    + calcularRecargo(...) : double
+    + calcular(...) : double
+  }
+  class CalculadorDescuento
+  class Factura {
+    - numero : String
+    - fecha : Fecha
+    - estado : EstadoFactura
+    - descuento : double
+    - recargo : double
+    - total : double
+  }
+  class LineaFactura
+  class NotaCredito
+  class ControladorFacturacion
+  ICalculadorDescuento <|.. CalculadorDescuento
+  ControladorFacturacion --> ICalculadorDescuento
+  Factura "1" *-- "1..*" LineaFactura
+  Factura "0..*" --> "1" Consulta
+  NotaCredito "0..*" --> "1" Factura
+  ControladorConsultas --> ControladorFacturacion
+}
+
+package persistencia {
+  class RepositorioSistema {
+    + guardar(sistema:SistemaPatitas) : void
+    + cargar() : SistemaPatitas
+  }
+  class RepositorioUsuarios {
+    - rutaArchivo : String
+    + inicializarSiNoExiste() : void
+    + validarCredenciales(legajo:String, contrasenia:String) : boolean
+    + registrarUsuario(legajo:String, contrasenia:String) : void
+    + cambiarContrasenia(legajo:String, nueva:String) : void
+    + existeUsuario(legajo:String) : boolean
+  }
+}
+
+package app {
+  abstract class MenuRol {
+    # sistema : SistemaPatitas
+    # usuarioActivo : PersonalClinica
+    + {abstract} mostrarMenu() : void
+    + {abstract} procesarOpcion(opcion:int) : AccionMenu
+    + ejecutar() : boolean
+  }
+  class MenuRecepcionista extends MenuRol
+  class MenuVeterinario extends MenuRol
+  class MenuAdministrador extends MenuRol
+  class ConsolaHelper
+  enum AccionMenu
+}
+
+package notificaciones {
+  class ServicioNotificaciones {
+    + notificar(duenio:Duenio, mensaje:String) : void
+    + registrarEvento(texto:String) : void
+  }
+}
+
+class SistemaPatitas
+class ReglaNegocioException
+
+@enduml

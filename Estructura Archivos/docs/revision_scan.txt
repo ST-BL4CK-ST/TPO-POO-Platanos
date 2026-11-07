@@ -1,0 +1,4 @@
+Restricted API scan:
+
+Java files: 56
+Test files: 2
