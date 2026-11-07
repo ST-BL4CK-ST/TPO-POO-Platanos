@@ -42,8 +42,9 @@ public class MenuRecepcionista extends MenuRol {
         System.out.println("5. Reprogramar / cancelar / ausente");
         System.out.println("6. Turno de urgencia");
         System.out.println("7. Cobrar factura pendiente");
-        System.out.println("8. Listar turnos");
-        System.out.println("9. Cerrar sesion");
+        System.out.println("8. Cobrar sena pendiente");
+        System.out.println("9. Listar turnos");
+        System.out.println("10. Cerrar sesion");
         System.out.println("0. Guardar y salir");
     }
 
@@ -57,8 +58,9 @@ public class MenuRecepcionista extends MenuRol {
             case 5: gestionarTurno(); return AccionMenu.CONTINUAR;
             case 6: asignarTurnoUrgencia(); return AccionMenu.CONTINUAR;
             case 7: cobrarFactura(); return AccionMenu.CONTINUAR;
-            case 8: listarTurnos(); return AccionMenu.CONTINUAR;
-            case 9: return AccionMenu.CERRAR_SESION;
+            case 8: cobrarSenaPendiente(); return AccionMenu.CONTINUAR;
+            case 9: listarTurnos(); return AccionMenu.CONTINUAR;
+            case 10: return AccionMenu.CERRAR_SESION;
             case 0: return AccionMenu.SALIR;
             default:
                 System.out.println("Opcion invalida.");
@@ -185,6 +187,18 @@ public class MenuRecepcionista extends MenuRol {
         int cuotas = medioPago == MedioPago.CREDITO ? ConsolaHelper.leerEnteroPositivo(scanner, "Cuotas: ") : 1;
         sistema.getControladorFacturacion().registrarPago(usuarioActivo, factura, medioPago, cuotas);
         System.out.println("Pago registrado. Descuento=$" + factura.getDescuento() + " recargo=$" + factura.getRecargo() + " total=$" + factura.getTotal());
+    }
+
+    private void cobrarSenaPendiente() throws ReglaNegocioException {
+        exigirRecepcionista();
+        Duenio duenio = exigirDuenio();
+        if (!duenio.requiereSena()) {
+            System.out.println("El duenio " + duenio.getNombreCompleto() + " no adeuda sena.");
+            return;
+        }
+        sistema.getControladorTurnos().registrarPagoSena(usuarioActivo, duenio);
+        System.out.println("Cobro de sena registrado correctamente para " + duenio.getNombreCompleto() +
+                ". Ya puede solicitar turnos nuevamente.");
     }
 
     private void listarTurnos() {

@@ -3,6 +3,7 @@ package ar.edu.uade.patitas.turnos;
 import ar.edu.uade.patitas.excepciones.ReglaNegocioException;
 import ar.edu.uade.patitas.mascotas.Mascota;
 import ar.edu.uade.patitas.personas.Administrador;
+import ar.edu.uade.patitas.personas.Duenio;
 import ar.edu.uade.patitas.personas.PersonalClinica;
 import ar.edu.uade.patitas.personas.Recepcionista;
 import ar.edu.uade.patitas.personas.Veterinario;
@@ -58,6 +59,13 @@ public class ControladorTurnos implements Serializable {
     public void marcarAusente(PersonalClinica usuario, Turno turno) throws ReglaNegocioException {
         validarRecepcion(usuario);
         turno.marcarAusente();
+    }
+
+    public void registrarPagoSena(PersonalClinica usuario, Duenio duenio) throws ReglaNegocioException {
+        validarRecepcion(usuario);
+        if (duenio == null) throw new ReglaNegocioException("Duenio inexistente");
+        if (!duenio.requiereSena()) throw new ReglaNegocioException("El duenio no adeuda sena");
+        duenio.registrarPagoSena();
     }
 
     public void asignarGuardia(PersonalClinica usuario, Fecha fecha, Veterinario veterinario)
