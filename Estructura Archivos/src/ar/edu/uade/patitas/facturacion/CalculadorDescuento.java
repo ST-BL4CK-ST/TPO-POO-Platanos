@@ -1,5 +1,14 @@
 package ar.edu.uade.patitas.facturacion;
 
+/**
+ * Reglas de precio de la clinica (Etapa 2).
+ * <ul>
+ *   <li>Descuento: 10% si se paga en efectivo y 15% si el cliente tiene plan de salud.
+ *       Los descuentos no se acumulan: se aplica el mayor.</li>
+ *   <li>Recargo: 8% si se paga con credito, calculado sobre el monto ya descontado.</li>
+ *   <li>Total = (subtotal - descuento) + recargo.</li>
+ * </ul>
+ */
 public class CalculadorDescuento implements ICalculadorDescuento {
     @Override
     public double calcularDescuento(double subtotal, MedioPago medioPago, boolean tienePlanSalud) {
