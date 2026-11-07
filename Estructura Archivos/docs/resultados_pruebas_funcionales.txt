@@ -1,0 +1,19 @@
+OK - PF-01 alta duenio y mascota
+OK - PF-02 asignar turno valido
+OK - PF-03 rechazar superposicion
+OK - PF-04 cancelacion tardia cobra 20%
+OK - PF-05 confirmar consulta e historia
+OK - PF-06 stock se descuenta al confirmar
+OK - PF-07 plan 15% + credito 8%
+OK - PF-08 anular con nota de credito
+OK - PF-09 recordatorio dentro de 7 dias
+OK - PF-10 transferencia conserva historia
+OK - PF-11 urgencia desplaza un turno
+OK - PF-12 login valido e invalido
+OK - PF-13 menu por rol
+Fecha: Fecha invalida, use dd/mm/aaaa (Fecha invalida)
+Fecha: OK - PF-14 fecha invalida con reintento
+Peso: Unidad (1=kg 2=lb): OK - PF-15 peso en lb
+OK - PF-16 veterinario sin turnos
+OK - PF-17 alta de usuario por Administrador
+RESULTADO FUNCIONAL: 17 correctas, 0 fallidas

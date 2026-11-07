@@ -1,0 +1,42 @@
+OK - Fecha bisiesta suma 1 dia
+OK - 02/11/2026 es lunes
+OK - Suma de minutos cambia de dia
+OK - Plan + efectivo aplica 15%
+OK - Credito con plan: 15% y luego 8%
+OK - Debito sin plan
+OK - FIFO agota primero el lote que vence antes
+OK - Comparator ordena productos por precio
+OK - Agenda rechaza superposicion
+OK - Confirmar consulta marca turno atendido
+OK - Confirmar consulta agrega historia
+OK - Confirmar consulta descuenta stock
+OK - Confirmar consulta genera factura
+OK - Falta stock rechaza confirmacion
+OK - Falta stock conserva turno programado
+OK - Falta stock no agrega historia
+OK - Falta stock no descuenta unidades
+OK - Archivo inexistente no existe inicialmente
+OK - Inicializa archivo inexistente y valida usuario demo
+OK - Login correcto V001
+OK - Login incorrecto contrasenia erronea
+OK - Login incorrecto usuario inexistente
+OK - Alta de usuario V002
+OK - Login de nuevo usuario V002
+OK - Alta duplicada lanza ReglaNegocioException
+OK - Login con nueva contrasenia exitoso
+OK - Login con contrasenia vieja falla
+OK - Contrasenia con ';' rechazada
+OK - 1 lb equivale a 0.45359237 kg
+OK - 10 lb equivale a 4.5359237 kg
+OK - Conversion rechaza peso menor o igual a cero
+Fecha: Fecha invalida, use dd/mm/aaaa (Fecha invalida)
+Fecha: OK - Reintento de fecha rechaza fecha inexistente y acepta valida
+Entero: Ingrese un numero entero valido.
+Entero: La cantidad debe ser mayor a cero.
+Entero: OK - Reintento entero positivo rechaza texto y negativo
+Opcion: Opcion invalida. Debe ser entre 1 y 3.
+Opcion: Opcion invalida. Debe ser entre 1 y 3.
+Opcion: OK - Reintento de opcion rechaza valores fuera de rango
+Peso: El valor debe ser mayor a cero.
+Peso: Unidad (1=kg 2=lb): OK - Reintento peso rechaza negativo y convierte libras a kg
+RESULTADO: 35 correctas, 0 fallidas

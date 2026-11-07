@@ -1,0 +1,137 @@
+
+=== Iniciar Sesion ===
+Usuario (legajo): Contrasenia: Credenciales incorrectas. Intentos restantes: 2
+Usuario (legajo): Contrasenia: 
+=== Veterinaria Patitas | Ana Perez (R001 - Recepcionista) ===
+1. Registrar duenio
+2. Registrar mascota
+3. Transferir mascota
+4. Asignar turno
+5. Reprogramar / cancelar / ausente
+6. Turno de urgencia
+7. Cobrar factura pendiente
+8. Listar turnos
+9. Cerrar sesion
+0. Guardar y salir
+Opcion: Documento del duenio: ID mascota: Nombre: Especie 1=Perro 2=Gato 3=Ave 4=Conejo: Raza: Sexo 1=Macho 2=Hembra: Fecha nacimiento dd/mm/aaaa: Fecha invalida, use dd/mm/aaaa (Fecha invalida)
+Fecha nacimiento dd/mm/aaaa: Fecha actual dd/mm/aaaa: Peso: El valor debe ser mayor a cero.
+Peso: Unidad (1=kg 2=lb): Vive en interior? s/n: Mascota registrada.
+
+=== Veterinaria Patitas | Ana Perez (R001 - Recepcionista) ===
+1. Registrar duenio
+2. Registrar mascota
+3. Transferir mascota
+4. Asignar turno
+5. Reprogramar / cancelar / ausente
+6. Turno de urgencia
+7. Cobrar factura pendiente
+8. Listar turnos
+9. Cerrar sesion
+0. Guardar y salir
+Opcion: -- Carla Diaz --
+-- Esteban Quito --
+
+=== Veterinaria Patitas | Ana Perez (R001 - Recepcionista) ===
+1. Registrar duenio
+2. Registrar mascota
+3. Transferir mascota
+4. Asignar turno
+5. Reprogramar / cancelar / ausente
+6. Turno de urgencia
+7. Cobrar factura pendiente
+8. Listar turnos
+9. Cerrar sesion
+0. Guardar y salir
+Opcion: Sesion cerrada.
+
+=== Iniciar Sesion ===
+Usuario (legajo): Contrasenia: 
+=== Veterinaria Patitas | Carla Diaz (V001 - Veterinario) ===
+1. Registrar y confirmar consulta
+2. Consultar historia clinica
+3. Ver mis turnos
+4. Cerrar sesion
+0. Guardar y salir
+Opcion: No hay ningun turno asignado
+
+=== Veterinaria Patitas | Carla Diaz (V001 - Veterinario) ===
+1. Registrar y confirmar consulta
+2. Consultar historia clinica
+3. Ver mis turnos
+4. Cerrar sesion
+0. Guardar y salir
+Opcion: No hay ningun turno asignado
+
+=== Veterinaria Patitas | Carla Diaz (V001 - Veterinario) ===
+1. Registrar y confirmar consulta
+2. Consultar historia clinica
+3. Ver mis turnos
+4. Cerrar sesion
+0. Guardar y salir
+Opcion: Sesion cerrada.
+
+=== Iniciar Sesion ===
+Usuario (legajo): Contrasenia: 
+=== Veterinaria Patitas | Luis Gomez (A001 - Administrador) ===
+1. Registrar producto o lote
+2. Consultar stock bajo
+3. Emitir recordatorios de vacunas
+4. Anular factura
+5. Asignar guardia
+6. Listar turnos de todos los veterinarios
+7. Gestionar usuarios
+8. Cerrar sesion
+0. Guardar y salir
+Opcion: 
+--- Gestion de Usuarios ---
+1. Crear usuario
+2. Modificar usuario
+3. Listar usuarios
+0. Volver
+Opcion: 
+--- Lista de Usuarios ---
+R001 | Ana Perez | Recepcionista | Tel: 1111 | Doc: 30000001
+V001 | Carla Diaz | Veterinario | Tel: 3333 | Doc: 30000003
+A001 | Luis Gomez | Administrador | Tel: 2222 | Doc: 30000002
+V002 | Esteban Quito | Veterinario | Tel: 11223344 | Doc: 50000001
+
+--- Gestion de Usuarios ---
+1. Crear usuario
+2. Modificar usuario
+3. Listar usuarios
+0. Volver
+Opcion: 
+--- Alta de Nuevo Usuario ---
+Nombre: Apellido: Documento: Telefono: Legajo: Tipo (1=Recepcionista 2=Veterinario 3=Administrador): Matricula: Especialidad: Contrasenia: Contrasenia invalida: La contrasenia no puede contener el caracter ';'
+Contrasenia: Usuario V003 registrado exitosamente.
+
+--- Gestion de Usuarios ---
+1. Crear usuario
+2. Modificar usuario
+3. Listar usuarios
+0. Volver
+Opcion: 
+--- Lista de Usuarios ---
+R001 | Ana Perez | Recepcionista | Tel: 1111 | Doc: 30000001
+V001 | Carla Diaz | Veterinario | Tel: 3333 | Doc: 30000003
+A001 | Luis Gomez | Administrador | Tel: 2222 | Doc: 30000002
+V002 | Esteban Quito | Veterinario | Tel: 11223344 | Doc: 50000001
+V003 | Carlos Ruiz | Veterinario | Tel: 11445566 | Doc: 35000001
+
+--- Gestion de Usuarios ---
+1. Crear usuario
+2. Modificar usuario
+3. Listar usuarios
+0. Volver
+Opcion: 
+=== Veterinaria Patitas | Luis Gomez (A001 - Administrador) ===
+1. Registrar producto o lote
+2. Consultar stock bajo
+3. Emitir recordatorios de vacunas
+4. Anular factura
+5. Asignar guardia
+6. Listar turnos de todos los veterinarios
+7. Gestionar usuarios
+8. Cerrar sesion
+0. Guardar y salir
+Opcion: Datos guardados.
