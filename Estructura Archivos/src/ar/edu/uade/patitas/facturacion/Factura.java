@@ -1,5 +1,6 @@
 package ar.edu.uade.patitas.facturacion;
 
+import ar.edu.uade.patitas.excepciones.ReglaNegocioException;
 import ar.edu.uade.patitas.historia.Consulta;
 import ar.edu.uade.patitas.tiempo.Fecha;
 import java.io.Serializable;
@@ -52,7 +53,17 @@ public class Factura implements Serializable {
         return subtotal;
     }
 
-    public void registrarPago(MedioPago medioPago, int cuotas, double descuento, double recargo, double total) {
+    public void registrarPago(MedioPago medioPago, int cuotas, double descuento, double recargo, double total)
+            throws ReglaNegocioException {
+        if (estado == EstadoFactura.ANULADA) {
+            throw new ReglaNegocioException("No se puede pagar una factura anulada");
+        }
+        if (estado == EstadoFactura.EMITIDA) {
+            throw new ReglaNegocioException("La factura ya fue abonada y emitida");
+        }
+        if (estado != EstadoFactura.PENDIENTE) {
+            throw new ReglaNegocioException("La factura no esta pendiente de pago");
+        }
         this.medioPago = medioPago;
         this.cuotas = cuotas;
         this.descuento = descuento;
@@ -61,7 +72,13 @@ public class Factura implements Serializable {
         this.estado = EstadoFactura.EMITIDA;
     }
 
-    public void anular() {
-        if (estado == EstadoFactura.EMITIDA) estado = EstadoFactura.ANULADA;
+    public void anular() throws ReglaNegocioException {
+        if (estado == EstadoFactura.ANULADA) {
+            throw new ReglaNegocioException("La factura ya se encuentra anulada");
+        }
+        if (estado != EstadoFactura.EMITIDA) {
+            throw new ReglaNegocioException("Solo se pueden anular facturas emitidas");
+        }
+        this.estado = EstadoFactura.ANULADA;
     }
 }

@@ -1,5 +1,6 @@
 package ar.edu.uade.patitas.personas;
 
+import ar.edu.uade.patitas.excepciones.ReglaNegocioException;
 import ar.edu.uade.patitas.mascotas.Mascota;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ public class Duenio extends Persona {
     private boolean planSaludAnimal;
     private int ausenciasConsecutivas;
     private boolean senaPendiente;
+    private double cargoPendiente;
     private List<Mascota> mascotas;
 
     public Duenio(String nombre, String apellido, String documento, String telefono, String correoElectronico) {
@@ -39,6 +41,23 @@ public class Duenio extends Persona {
 
     public void registrarPagoSena() {
         senaPendiente = false;
+    }
+
+    public double getCargoPendiente() { return cargoPendiente; }
+    public boolean tieneCargoPendiente() { return cargoPendiente > 0; }
+
+    public void agregarCargoPendiente(double monto) {
+        if (monto > 0) cargoPendiente += monto;
+    }
+
+    public void registrarPagoCargo(double monto) throws ReglaNegocioException {
+        if (monto <= 0) throw new ReglaNegocioException("Monto a pagar invalido");
+        if (monto > cargoPendiente) throw new ReglaNegocioException("El monto supera el cargo pendiente");
+        cargoPendiente -= monto;
+    }
+
+    public void registrarPagoCargoPendiente() {
+        cargoPendiente = 0.0;
     }
 
     public void agregarMascota(Mascota mascota) {
