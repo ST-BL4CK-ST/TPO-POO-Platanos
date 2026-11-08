@@ -108,7 +108,7 @@ public class MenuVeterinario extends MenuRol {
         sistema.getControladorConsultas().registrarDatosClinicos(usuarioActivo, consulta,
                 motivo, pesoDelDia, diagnostico, observaciones);
 
-        if (ConsolaHelper.leerSiNo(scanner, "Agregar tratamiento? s/n: ")) {
+        while (ConsolaHelper.leerSiNo(scanner, "Agregar tratamiento? s/n: ")) {
             Producto producto = exigirProducto();
             String dosis = ConsolaHelper.leerTextoNoVacio(scanner, "Dosis: ");
             String frecuencia = ConsolaHelper.leerTextoNoVacio(scanner, "Frecuencia: ");
@@ -116,12 +116,14 @@ public class MenuVeterinario extends MenuRol {
             int cantidad = ConsolaHelper.leerEnteroPositivo(scanner, "Cantidad a consumir: ");
             sistema.getControladorConsultas().agregarTratamiento(usuarioActivo, consulta, producto,
                     dosis, frecuencia, duracion, cantidad);
+            System.out.println("Tratamiento agregado.");
         }
 
-        if (ConsolaHelper.leerSiNo(scanner, "Aplicar vacuna? s/n: ")) {
+        while (ConsolaHelper.leerSiNo(scanner, "Aplicar vacuna? s/n: ")) {
             VacunaDefinicion vacuna = sistema.buscarVacuna(ConsolaHelper.leerTexto(scanner, "Nombre de vacuna: "));
             if (vacuna == null) throw new ReglaNegocioException("Vacuna no encontrada");
             sistema.getControladorConsultas().aplicarVacuna(usuarioActivo, consulta, vacuna);
+            System.out.println("Vacuna agregada.");
         }
 
         Factura factura = sistema.getControladorConsultas().confirmarConsulta(usuarioActivo, consulta);
