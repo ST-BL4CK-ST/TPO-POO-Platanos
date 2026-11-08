@@ -29,10 +29,12 @@ import ar.edu.uade.patitas.tiempo.Fecha;
 import ar.edu.uade.patitas.tiempo.FechaHora;
 import ar.edu.uade.patitas.tiempo.Hora;
 import ar.edu.uade.patitas.tiempo.TramoHorario;
+import ar.edu.uade.patitas.turnos.Cirugia;
 import ar.edu.uade.patitas.turnos.ConsultaGeneral;
 import ar.edu.uade.patitas.turnos.ControladorTurnos;
 import ar.edu.uade.patitas.turnos.EstadoTurno;
 import ar.edu.uade.patitas.turnos.Turno;
+import ar.edu.uade.patitas.turnos.Vacunacion;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
@@ -346,17 +348,48 @@ public class PruebasUnitarias {
             verificar("Tres ausencias exigen sena, pago habilita nueva reserva",
                     bloqueoPorSena && !e3.duenio.requiereSena() && ta4 != null);
 
-            // 4. Urgencia con el turno siguiente ocupado
-            Escenario e4 = crearEscenario(5);
-            ct.asignarGuardia(new ar.edu.uade.patitas.personas.Administrador("Adm", "U", "99", "999", "A99"),
-                    new Fecha(2, 11, 2026), e4.veterinario);
-            Turno tProg = ct.asignarTurno(e4.recepcionista, e4.mascota, e4.veterinario,
+            // 4. Urgencias con el turno siguiente ocupado (vacunacion 15m, consulta 30m, cirugia 120m)
+            // 4a. Urgencia sobre vacunacion de 15 min
+            Escenario e4a = crearEscenario(5);
+            ControladorTurnos ctUrgA = new ControladorTurnos();
+            ctUrgA.asignarGuardia(new ar.edu.uade.patitas.personas.Administrador("Adm", "U", "99", "999", "A99"),
+                    new Fecha(2, 11, 2026), e4a.veterinario);
+            Turno tVacProg = ctUrgA.asignarTurno(e4a.recepcionista, e4a.mascota, e4a.veterinario,
+                    new FechaHora(new Fecha(2, 11, 2026), new Hora(14, 0)), new Vacunacion(500));
+            Turno tUrgA = ctUrgA.asignarUrgencia(e4a.recepcionista, e4a.mascota,
                     new FechaHora(new Fecha(2, 11, 2026), new Hora(14, 0)), new ConsultaGeneral(1000));
-            Turno tUrg = ct.asignarUrgencia(e4.recepcionista, e4.mascota,
+            verificar("Urgencia desplaza vacunacion de 15 min sin superposicion",
+                    tUrgA.esUrgencia() && ctUrgA.getUltimoTurnoDesplazado() == tVacProg &&
+                            tVacProg.getFechaHora().toString().equals("02/11/2026 14:30") &&
+                            e4a.veterinario.getAgenda().getTurnos().size() == 2);
+
+            // 4b. Urgencia sobre consulta general de 30 min
+            Escenario e4b = crearEscenario(5);
+            ControladorTurnos ctUrgB = new ControladorTurnos();
+            ctUrgB.asignarGuardia(new ar.edu.uade.patitas.personas.Administrador("Adm", "U", "99", "999", "A99"),
+                    new Fecha(2, 11, 2026), e4b.veterinario);
+            Turno tConsProg = ctUrgB.asignarTurno(e4b.recepcionista, e4b.mascota, e4b.veterinario,
                     new FechaHora(new Fecha(2, 11, 2026), new Hora(14, 0)), new ConsultaGeneral(1000));
-            verificar("Urgencia desplaza turno siguiente a hueco libre",
-                    tUrg.esUrgencia() && ct.getUltimoTurnoDesplazado() == tProg &&
-                            tProg.getFechaHora().toString().equals("02/11/2026 14:30"));
+            Turno tUrgB = ctUrgB.asignarUrgencia(e4b.recepcionista, e4b.mascota,
+                    new FechaHora(new Fecha(2, 11, 2026), new Hora(14, 0)), new ConsultaGeneral(1000));
+            verificar("Urgencia desplaza consulta de 30 min sin superposicion",
+                    tUrgB.esUrgencia() && ctUrgB.getUltimoTurnoDesplazado() == tConsProg &&
+                            tConsProg.getFechaHora().toString().equals("02/11/2026 14:30") &&
+                            e4b.veterinario.getAgenda().getTurnos().size() == 2);
+
+            // 4c. Urgencia sobre cirugia de 120 min
+            Escenario e4c = crearEscenario(5);
+            ControladorTurnos ctUrgC = new ControladorTurnos();
+            ctUrgC.asignarGuardia(new ar.edu.uade.patitas.personas.Administrador("Adm", "U", "99", "999", "A99"),
+                    new Fecha(2, 11, 2026), e4c.veterinario);
+            Turno tCirProg = ctUrgC.asignarTurno(e4c.recepcionista, e4c.mascota, e4c.veterinario,
+                    new FechaHora(new Fecha(2, 11, 2026), new Hora(14, 0)), new Cirugia(3000));
+            Turno tUrgC = ctUrgC.asignarUrgencia(e4c.recepcionista, e4c.mascota,
+                    new FechaHora(new Fecha(2, 11, 2026), new Hora(14, 0)), new ConsultaGeneral(1000));
+            verificar("Urgencia desplaza cirugia de 120 min sin superposicion",
+                    tUrgC.esUrgencia() && ctUrgC.getUltimoTurnoDesplazado() == tCirProg &&
+                            tCirProg.getFechaHora().toString().equals("02/11/2026 16:00") &&
+                            e4c.veterinario.getAgenda().getTurnos().size() == 2);
 
             // 5. Vacuna antes de la edad minima rechazada
             Escenario e5 = crearEscenario(5);

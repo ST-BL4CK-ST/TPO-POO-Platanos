@@ -122,7 +122,9 @@ public class ControladorTurnos implements Serializable {
         Turno ocupado = guardia.getAgenda().buscarTurnoSuperpuesto(candidato, atencionUrgencia.getDuracionMinutos());
         if (ocupado != null) {
             int duracionOcupado = ocupado.getAtencion().getDuracionMinutos();
-            FechaHora buscarDesde = ocupado.getFechaHora().sumarMinutos(duracionOcupado);
+            FechaHora finOcupado = ocupado.getFechaHora().sumarMinutos(duracionOcupado);
+            FechaHora finUrgencia = candidato.sumarMinutos(atencionUrgencia.getDuracionMinutos());
+            FechaHora buscarDesde = finOcupado.compareTo(finUrgencia) > 0 ? finOcupado : finUrgencia;
             FechaHora nuevaFecha = guardia.getAgenda().getPrimerHuecoLibre(buscarDesde, duracionOcupado, ocupado);
             if (nuevaFecha == null) throw new ReglaNegocioException("La urgencia requeriria desplazar mas de un turno");
             ocupado.reprogramar(nuevaFecha);
