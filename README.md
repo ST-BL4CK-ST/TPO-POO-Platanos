@@ -34,8 +34,8 @@ La implementación parte del diagrama final de la Etapa 1. Se mantuvieron los co
 
 ## Requisitos
 
-- Java 17 o superior.
-- Ejecutar los comandos desde la carpeta raíz del proyecto.
+- JDK 17 o superior, con los comandos java y javac disponibles en la terminal.
+- Los comandos de compilación, ejecución y pruebas se corren desde la carpeta del proyecto Java, Estructura Archivos/.
 - No requiere Maven, Gradle, JUnit ni librerías externas.
 
 ## Estructura
@@ -45,18 +45,27 @@ La implementación parte del diagrama final de la Etapa 1. Se mantuvieron los co
 - `docs/`: plan de pruebas, resultados, informe final y UML actualizado.
 - `data/`: persistencia binaria y log de notificaciones.
 
-## Compilación
+## Compilación y ejecución
 
-```bash
-mkdir -p out
-javac -encoding UTF-8 -d out $(find src -name "*.java" | sort)
-```
+Desde la raíz del repositorio, entrá a la carpeta del proyecto Java. Las rutas de datos se resuelven desde esa carpeta.
 
-## Ejecución
+**Windows con PowerShell**
 
-```bash
+~~~powershell
+cd "Estructura Archivos"
+$fuentes = Get-ChildItem -Path src -Recurse -Filter '*.java' -File
+javac -encoding UTF-8 -d out $fuentes.FullName
 java -cp out ar.edu.uade.patitas.app.Main
-```
+~~~
+
+**Git Bash, Linux o macOS**
+
+~~~bash
+cd "Estructura Archivos"
+javac -encoding UTF-8 -d out $(find src -name "*.java" | sort)
+java -cp out ar.edu.uade.patitas.app.Main
+~~~
+
 
 ### Autenticación y Control de Acceso
 
@@ -100,22 +109,33 @@ Datos de prueba principales:
 
 ## Pruebas
 
-Primero compilar el código principal y luego las pruebas:
+Desde Estructura Archivos/, compilá la aplicación y las pruebas en el mismo directorio de salida. Cada suite se ejecuta por separado.
 
-```bash
-mkdir -p out-test
-javac -encoding UTF-8 -cp out -d out-test $(find test -name "*.java" | sort)
-java -cp out:out-test ar.edu.uade.patitas.test.PruebasUnitarias
-java -cp out:out-test ar.edu.uade.patitas.test.PruebasFuncionales
-```
+**Windows con PowerShell**
 
-Resultados obtenidos en la puesta a punto incluida:
+~~~powershell
+$fuentes = Get-ChildItem -Path src,test -Recurse -Filter '*.java' -File
+javac -encoding UTF-8 -d out $fuentes.FullName
+java -cp out ar.edu.uade.patitas.test.PruebasUnitarias
+java -cp out ar.edu.uade.patitas.test.PruebasFuncionales
+~~~
 
-- Pruebas unitarias: **35 correctas, 0 fallidas**.
+**Git Bash, Linux o macOS**
+
+~~~bash
+javac -encoding UTF-8 -d out $(find src test -name "*.java" | sort)
+java -cp out ar.edu.uade.patitas.test.PruebasUnitarias
+java -cp out ar.edu.uade.patitas.test.PruebasFuncionales
+~~~
+
+Resultados verificados con JDK 17.0.1 sobre el código de la rama saturnito en f0ea70a:
+
+- Pruebas unitarias: **46 correctas, 0 fallidas**.
 - Pruebas funcionales: **17 correctas, 0 fallidas**.
-- Smoke test de consola: inicio de sesión por TXT, menú polimórfico por rol, consulta de turnos, alta de usuario y guardado: correcto.
+- Comprobación de arranque: inicio de sesión como recepcionista, presentación del menú y guardado al salir.
 
-Los resultados completos están en `docs/resultados_pruebas_unitarias.txt`, `docs/resultados_pruebas_funcionales.txt` y `docs/smoke_consola.txt`.
+Los resultados de ambas suites están en docs/resultados_pruebas_unitarias.txt y docs/resultados_pruebas_funcionales.txt. En docs/smoke_consola.txt está el registro anterior de la comprobación de consola por rol.
+
 
 ## Persistencia
 
