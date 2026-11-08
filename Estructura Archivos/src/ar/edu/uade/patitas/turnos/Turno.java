@@ -41,11 +41,22 @@ public class Turno implements Comparable<Turno>, Serializable {
         fechaHora = nuevaFecha;
     }
 
+    public double calcularCargoCancelacion(FechaHora momentoCancelacion) throws ReglaNegocioException {
+        if (estado != EstadoTurno.PROGRAMADO) throw new ReglaNegocioException("El turno no esta programado");
+        int minutos = momentoCancelacion.minutosHasta(fechaHora);
+        if (minutos < 0) throw new ReglaNegocioException("No se puede cancelar un turno que ya paso");
+        if (minutos < 120) return atencion.getArancel() * 0.20;
+        return 0.0;
+    }
+
     public void cancelar(FechaHora momentoCancelacion) throws ReglaNegocioException {
         if (estado != EstadoTurno.PROGRAMADO) throw new ReglaNegocioException("El turno no esta programado");
         int minutos = momentoCancelacion.minutosHasta(fechaHora);
         if (minutos < 0) throw new ReglaNegocioException("No se puede cancelar un turno que ya paso");
-        if (minutos < 120) cargoCancelacion = atencion.getArancel() * 0.20;
+        if (minutos < 120) {
+            cargoCancelacion = atencion.getArancel() * 0.20;
+            mascota.getDuenio().agregarCargoPendiente(cargoCancelacion);
+        }
         estado = EstadoTurno.CANCELADO;
     }
 
