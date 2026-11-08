@@ -43,8 +43,9 @@ public class MenuRecepcionista extends MenuRol {
         System.out.println("6. Turno de urgencia");
         System.out.println("7. Cobrar factura pendiente");
         System.out.println("8. Cobrar sena pendiente");
-        System.out.println("9. Listar turnos");
-        System.out.println("10. Cerrar sesion");
+        System.out.println("9. Cobrar cargo por cancelacion tardia");
+        System.out.println("10. Listar turnos");
+        System.out.println("11. Cerrar sesion");
         System.out.println("0. Guardar y salir");
     }
 
@@ -59,8 +60,9 @@ public class MenuRecepcionista extends MenuRol {
             case 6: asignarTurnoUrgencia(); return AccionMenu.CONTINUAR;
             case 7: cobrarFactura(); return AccionMenu.CONTINUAR;
             case 8: cobrarSenaPendiente(); return AccionMenu.CONTINUAR;
-            case 9: listarTurnos(); return AccionMenu.CONTINUAR;
-            case 10: return AccionMenu.CERRAR_SESION;
+            case 9: cobrarCargoCancelacion(); return AccionMenu.CONTINUAR;
+            case 10: listarTurnos(); return AccionMenu.CONTINUAR;
+            case 11: return AccionMenu.CERRAR_SESION;
             case 0: return AccionMenu.SALIR;
             default:
                 System.out.println("Opcion invalida.");
@@ -154,11 +156,27 @@ public class MenuRecepcionista extends MenuRol {
         Turno turno = exigirTurno();
         int op = ConsolaHelper.leerOpcion(scanner, "1=Reprogramar 2=Cancelar 3=Marcar ausente: ", 1, 3);
         if (op == 1) {
-            sistema.getControladorTurnos().reprogramarTurno(usuarioActivo, turno, ConsolaHelper.leerFechaHora(scanner));
+            FechaHora momento = ConsolaHelper.leerFechaHoraConEtiqueta(scanner, "Momento actual de la solicitud");
+            int minutos = momento.minutosHasta(turno.getFechaHora());
+            if (minutos < 120 && minutos >= 0) {
+                double cargo = turno.getAtencion().getArancel() * 0.20;
+                System.out.println("Aviso: Reprogramar con menos de 2 horas aplica cargo del 20% ($" + cargo + ").");
+            }
+            FechaHora nuevaFecha = ConsolaHelper.leerFechaHora(scanner);
+            sistema.getControladorTurnos().reprogramarTurno(usuarioActivo, turno, nuevaFecha, momento);
             System.out.println("Turno reprogramado.");
         } else if (op == 2) {
             FechaHora momento = ConsolaHelper.leerFechaHoraConEtiqueta(scanner, "Momento de cancelacion");
-            sistema.getControladorTurnos().cancelarTurno(usuarioActivo, turno, momento);
+            double cargo = sistema.getControladorTurnos().calcularCargoCancelacion(turno, momento);
+            if (cargo > 0) {
+                System.out.println("Cancelacion con menos de 2 horas. Aplica cargo de 20%: $" + cargo);
+                boolean confirma = ConsolaHelper.leerSiNo(scanner, "Desea confirmar la cancelacion con cargo? (s/n): ");
+                if (!confirma) {
+                    System.out.println("Cancelacion abortada. El turno permanece programado.");
+                    return;
+                }
+            }
+            sistema.getControladorTurnos().cancelarTurno(usuarioActivo, turno, momento, true);
             System.out.println("Turno cancelado. Cargo: $" + turno.getCargoCancelacion());
         } else if (op == 3) {
             sistema.getControladorTurnos().marcarAusente(usuarioActivo, turno);
@@ -199,6 +217,19 @@ public class MenuRecepcionista extends MenuRol {
         sistema.getControladorTurnos().registrarPagoSena(usuarioActivo, duenio);
         System.out.println("Cobro de sena registrado correctamente para " + duenio.getNombreCompleto() +
                 ". Ya puede solicitar turnos nuevamente.");
+    }
+
+    private void cobrarCargoCancelacion() throws ReglaNegocioException {
+        exigirRecepcionista();
+        Duenio duenio = exigirDuenio();
+        if (!duenio.tieneCargoPendiente()) {
+            System.out.println("El duenio " + duenio.getNombreCompleto() + " no tiene cargos pendientes.");
+            return;
+        }
+        System.out.println("Cargo pendiente total: $" + duenio.getCargoPendiente());
+        double monto = ConsolaHelper.leerDoublePositivo(scanner, "Monto a cobrar: ");
+        sistema.getControladorTurnos().registrarPagoCargo(usuarioActivo, duenio, monto);
+        System.out.println("Pago de cargo registrado. Saldo pendiente: $" + duenio.getCargoPendiente());
     }
 
     private void listarTurnos() {

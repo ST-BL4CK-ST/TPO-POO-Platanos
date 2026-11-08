@@ -39,9 +39,17 @@ public class ControladorTurnos implements Serializable {
         return veterinario.agendarTurno(mascota, fechaHora, atencion);
     }
 
-    public void reprogramarTurno(PersonalClinica usuario, Turno turno, FechaHora nuevaFechaHora)
+    public void reprogramarTurno(PersonalClinica usuario, Turno turno, FechaHora nuevaFechaHora, FechaHora momentoSolicitud)
             throws ReglaNegocioException {
         validarRecepcion(usuario);
+        if (momentoSolicitud != null) {
+            int minutos = momentoSolicitud.minutosHasta(turno.getFechaHora());
+            if (minutos < 0) throw new ReglaNegocioException("No se puede reprogramar un turno que ya paso");
+            if (minutos < 120) {
+                double cargo = turno.getAtencion().getArancel() * 0.20;
+                turno.getMascota().getDuenio().agregarCargoPendiente(cargo);
+            }
+        }
         Veterinario vet = turno.getVeterinario();
         int duracion = turno.getAtencion().getDuracionMinutos();
         if (!vet.dentroDeHorario(nuevaFechaHora, duracion) || vet.getAgenda().haySuperposicion(nuevaFechaHora, duracion, turno)) {
@@ -50,10 +58,34 @@ public class ControladorTurnos implements Serializable {
         turno.reprogramar(nuevaFechaHora);
     }
 
-    public void cancelarTurno(PersonalClinica usuario, Turno turno, FechaHora momentoCancelacion)
+    public void reprogramarTurno(PersonalClinica usuario, Turno turno, FechaHora nuevaFechaHora)
+            throws ReglaNegocioException {
+        reprogramarTurno(usuario, turno, nuevaFechaHora, null);
+    }
+
+    public double calcularCargoCancelacion(Turno turno, FechaHora momentoCancelacion) throws ReglaNegocioException {
+        return turno.calcularCargoCancelacion(momentoCancelacion);
+    }
+
+    public void cancelarTurno(PersonalClinica usuario, Turno turno, FechaHora momentoCancelacion, boolean confirmaCargo)
             throws ReglaNegocioException {
         validarRecepcion(usuario);
+        double cargo = turno.calcularCargoCancelacion(momentoCancelacion);
+        if (cargo > 0 && !confirmaCargo) {
+            throw new ReglaNegocioException("Cancelacion no confirmada; el turno sigue programado");
+        }
         turno.cancelar(momentoCancelacion);
+    }
+
+    public void cancelarTurno(PersonalClinica usuario, Turno turno, FechaHora momentoCancelacion)
+            throws ReglaNegocioException {
+        cancelarTurno(usuario, turno, momentoCancelacion, true);
+    }
+
+    public void registrarPagoCargo(PersonalClinica usuario, Duenio duenio, double monto) throws ReglaNegocioException {
+        validarRecepcion(usuario);
+        if (duenio == null) throw new ReglaNegocioException("Duenio inexistente");
+        duenio.registrarPagoCargo(monto);
     }
 
     public void marcarAusente(PersonalClinica usuario, Turno turno) throws ReglaNegocioException {
