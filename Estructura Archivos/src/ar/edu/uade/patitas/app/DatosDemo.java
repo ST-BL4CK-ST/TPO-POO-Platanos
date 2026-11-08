@@ -52,5 +52,26 @@ public class DatosDemo {
         vacuna.agregarEspecie("Perro");
         sistema.registrarVacuna(vacuna);
         perro.agregarVacunaAlCalendario(vacuna);
+
+        Producto tripleFelina = new Producto("P003", "Vacuna triple felina", 2, "Proveedor B", 6500);
+        tripleFelina.agregarLote(new Lote("L-TF1", 6, new Fecha(30, 12, 2026)), new Fecha(1, 11, 2026));
+        sistema.getServicioStock().agregarProducto(tripleFelina);
+        VacunaDefinicion vFelina = new VacunaDefinicion("Triple Felina", 8, 365, tripleFelina);
+        vFelina.agregarEspecie("Gato");
+        sistema.registrarVacuna(vFelina);
+
+        Producto newcastle = new Producto("P004", "Vacuna Newcastle", 2, "Proveedor C", 4000);
+        newcastle.agregarLote(new Lote("L-NC1", 10, new Fecha(30, 12, 2026)), new Fecha(1, 11, 2026));
+        sistema.getServicioStock().agregarProducto(newcastle);
+        VacunaDefinicion vNewcastle = new VacunaDefinicion("Newcastle", 4, 180, newcastle);
+        vNewcastle.agregarEspecie("Ave");
+        sistema.registrarVacuna(vNewcastle);
+
+        Producto mixomatosis = new Producto("P005", "Vacuna Mixomatosis", 2, "Proveedor C", 4500);
+        mixomatosis.agregarLote(new Lote("L-MX1", 5, new Fecha(30, 12, 2026)), new Fecha(1, 11, 2026));
+        sistema.getServicioStock().agregarProducto(mixomatosis);
+        VacunaDefinicion vMixomatosis = new VacunaDefinicion("Mixomatosis", 5, 180, mixomatosis);
+        vMixomatosis.agregarEspecie("Conejo");
+        sistema.registrarVacuna(vMixomatosis);
     }
 }
