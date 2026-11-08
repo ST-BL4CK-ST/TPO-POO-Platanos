@@ -3,6 +3,9 @@ package ar.edu.uade.patitas.app;
 import ar.edu.uade.patitas.excepciones.ReglaNegocioException;
 import ar.edu.uade.patitas.facturacion.Factura;
 import ar.edu.uade.patitas.historia.Consulta;
+import ar.edu.uade.patitas.historia.NotaRectificatoria;
+import ar.edu.uade.patitas.historia.Tratamiento;
+import ar.edu.uade.patitas.historia.VacunaAplicada;
 import ar.edu.uade.patitas.historia.VacunaDefinicion;
 import ar.edu.uade.patitas.mascotas.Mascota;
 import ar.edu.uade.patitas.notificaciones.ServicioNotificaciones;
@@ -10,6 +13,7 @@ import ar.edu.uade.patitas.personas.PersonalClinica;
 import ar.edu.uade.patitas.personas.Veterinario;
 import ar.edu.uade.patitas.persistencia.RepositorioUsuarios;
 import ar.edu.uade.patitas.stock.Producto;
+import ar.edu.uade.patitas.tiempo.Fecha;
 import ar.edu.uade.patitas.turnos.EstadoTurno;
 import ar.edu.uade.patitas.turnos.Turno;
 import java.io.IOException;
@@ -29,8 +33,9 @@ public class MenuVeterinario extends MenuRol {
         mostrarEncabezado("Veterinario");
         System.out.println("1. Registrar y confirmar consulta");
         System.out.println("2. Consultar historia clinica");
-        System.out.println("3. Ver mis turnos");
-        System.out.println("4. Cerrar sesion");
+        System.out.println("3. Registrar nota rectificatoria");
+        System.out.println("4. Ver mis turnos");
+        System.out.println("5. Cerrar sesion");
         System.out.println("0. Guardar y salir");
     }
 
@@ -39,8 +44,9 @@ public class MenuVeterinario extends MenuRol {
         switch (opcion) {
             case 1: registrarConsulta(); return AccionMenu.CONTINUAR;
             case 2: mostrarHistoriaClinica(); return AccionMenu.CONTINUAR;
-            case 3: verMisTurnos(); return AccionMenu.CONTINUAR;
-            case 4: return AccionMenu.CERRAR_SESION;
+            case 3: registrarNotaRectificatoria(); return AccionMenu.CONTINUAR;
+            case 4: verMisTurnos(); return AccionMenu.CONTINUAR;
+            case 5: return AccionMenu.CERRAR_SESION;
             case 0: return AccionMenu.SALIR;
             default:
                 System.out.println("Opcion invalida.");
@@ -130,9 +136,73 @@ public class MenuVeterinario extends MenuRol {
             System.out.println("Historia clinica vacia.");
             return;
         }
+        System.out.println("=== Historia Clinica de " + mascota.getNombre() + " (" + mascota.getEspecie() + ") ===");
         for (Consulta consulta : historia) {
-            System.out.println(consulta.getTurno().getFechaHora() + " | " + consulta.getDiagnostico() + " | peso=" + consulta.getPesoDelDia() + " kg");
+            System.out.println("--------------------------------------------------");
+            System.out.println("Fecha/Hora: " + consulta.getTurno().getFechaHora() +
+                    " | Dr/a. " + consulta.getVeterinario().getNombreCompleto() +
+                    " (MP: " + consulta.getVeterinario().getMatricula() + ")");
+            System.out.println("Motivo: " + consulta.getMotivo() +
+                    " | Diagnostico: " + consulta.getDiagnostico() +
+                    " | Peso: " + consulta.getPesoDelDia() + " kg");
+            if (consulta.getObservaciones() != null && !consulta.getObservaciones().isBlank()) {
+                System.out.println("Observaciones: " + consulta.getObservaciones());
+            }
+
+            List<Tratamiento> tratamientos = consulta.getTratamientos();
+            if (!tratamientos.isEmpty()) {
+                System.out.println("  Tratamientos indicados:");
+                for (Tratamiento t : tratamientos) {
+                    System.out.println("    - " + t.getProducto().getNombre() +
+                            ": " + t.getDosis() + " cada " + t.getFrecuencia() +
+                            " por " + t.getDuracion() + " (cant: " + t.getCantidad() + ")");
+                }
+            }
+
+            List<VacunaAplicada> vacunas = consulta.getVacunasAplicadas();
+            if (!vacunas.isEmpty()) {
+                System.out.println("  Vacunas aplicadas:");
+                for (VacunaAplicada v : vacunas) {
+                    System.out.println("    - " + v.getDefinicion().getNombre() +
+                            " | Lote: " + (v.getLote() != null ? v.getLote() : "N/A") +
+                            " | Aplicada: " + v.getFechaAplicacion() +
+                            " | Proximo refuerzo: " + v.getFechaProximoRefuerzo());
+                }
+            }
+
+            List<NotaRectificatoria> notas = consulta.getNotasRectificatorias();
+            if (!notas.isEmpty()) {
+                System.out.println("  Notas rectificatorias asociadas:");
+                for (NotaRectificatoria n : notas) {
+                    System.out.println("    * [" + n.getFecha() + " - Dr/a. " +
+                            n.getVeterinarioFirmante().getNombreCompleto() + "]: " + n.getTexto());
+                }
+            }
         }
+        System.out.println("--------------------------------------------------");
+    }
+
+    private void registrarNotaRectificatoria() throws ReglaNegocioException {
+        exigirVeterinarioLogueado();
+        Mascota mascota = exigirMascota();
+        List<Consulta> historia = mascota.getHistoriaClinica();
+        if (historia.isEmpty()) {
+            System.out.println("No hay consultas confirmadas para esta mascota.");
+            return;
+        }
+        System.out.println("Consultas confirmadas de " + mascota.getNombre() + ":");
+        for (int i = 0; i < historia.size(); i++) {
+            Consulta c = historia.get(i);
+            System.out.println((i + 1) + ". " + c.getTurno().getFechaHora() + " | Dr/a. " +
+                    c.getVeterinario().getNombreCompleto() + " | " + c.getDiagnostico());
+        }
+        int seleccion = ConsolaHelper.leerOpcion(scanner, "Seleccione consulta a rectificar (1-" + historia.size() + "): ", 1, historia.size());
+        Consulta consulta = historia.get(seleccion - 1);
+
+        String texto = ConsolaHelper.leerTextoNoVacio(scanner, "Texto rectificatorio: ");
+        Fecha fecha = ConsolaHelper.leerFecha(scanner, "Fecha de la nota dd/mm/aaaa: ");
+        sistema.getControladorConsultas().registrarNotaRectificatoria(usuarioActivo, consulta, texto, fecha);
+        System.out.println("Nota rectificatoria registrada correctamente. El registro original permanece intacto.");
     }
 
     private void verMisTurnos() throws ReglaNegocioException {
