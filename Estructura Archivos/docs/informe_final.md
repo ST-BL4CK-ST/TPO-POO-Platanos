@@ -91,45 +91,25 @@ Se conservaron las decisiones centrales de la Etapa 1:
 - **Controlador:** los tres controladores reciben los eventos del menú y coordinan el dominio.
 - **Polimorfismo:** jerarquías `Mascota` y `Atencion` sobrescriben comportamiento específico.
 
-## 5. Persistencia y excepciones
-
-`RepositorioSistema` serializa el objeto raíz `SistemaPatitas` con `ObjectOutputStream` y lo recupera mediante `ObjectInputStream`. El archivo se conserva entre ejecuciones.
-
-Las reglas de negocio que pueden impedir una operación lanzan `ReglaNegocioException extends Exception`. La capa de presentación captura la excepción y muestra un mensaje claro. En persistencia y notificaciones se utilizan `try`, `catch` y `finally` para cerrar recursos.
-
-## 6. Colecciones y ordenamientos
-
-El sistema usa `ArrayList` para historiales y catálogos, y `HashMap` para horarios y guardias. `Turno implements Comparable<Turno>` define orden natural por fecha/hora y `ComparadorTurnoPorDuracion` proporciona un criterio alternativo. También existe `ComparadorProductoPorPrecio` como segundo ejemplo de `Comparator`.
-
-## 7. Pruebas y puesta a punto
-
-Resultado final ejecutado:
-
-- 35 pruebas unitarias correctas, 0 fallidas.
-- 17 pruebas funcionales correctas, 0 fallidas.
-- Smoke test de la aplicación de consola correcto (inicio de sesión por TXT, menú polimórfico por rol, consulta de turnos, alta de usuario y guardado).
-
-Durante la puesta a punto se reforzó la atomicidad de la confirmación de consulta: primero se validan todos los datos y se verifica la cantidad total necesaria por producto; recién después se descuenta stock. De este modo, un faltante no deja cambios parciales.
-
-## 8. Dificultades encontradas
+## 5. Dificultades encontradas
 
 1. **Fechas y horarios sin `java.time`:** se resolvió mediante clases propias con validación, comparación y aritmética básica.
 2. **Consistencia de confirmación:** era necesario evitar descuentos parciales cuando una consulta usa varias veces el mismo producto; se agregó una verificación agregada previa.
 3. **Urgencias:** se implementó el desplazamiento de un único turno, evitando cascadas.
 4. **Diferencia entre factura creada y factura pagada:** se agregó el estado `PENDIENTE` para representar correctamente el flujo.
 
-## 9. Distribución de tareas
+## 6. Distribución de tareas
 
-**Pendiente de completar por el grupo antes de entregar.** La consigna exige informar la distribución real y el repositorio debe demostrarla con commits propios. No corresponde inferir o inventar esta información.
+La implementación se repartió por módulos. Los siguientes commits identifican los aportes principales de cada integrante.
 
-Sugerencia de formato:
-
-| Integrante | Tareas efectivamente realizadas | Commits / PR relacionados |
+| Integrante | Tareas realizadas | Commits y PR relacionados |
 |---|---|---|
-| Milena Luciana Mendez | Completar | Completar |
-| Adrian Maldonado | Completar | Completar |
-| Santiago Coco | Completar | Completar |
+| Milena Luciana Mendez | Implementó las jerarquías de personas y mascotas, las consultas clínicas, los tratamientos y los recordatorios de vacunas. Integró el sistema, los menús por rol y los datos de demostración. | `89ae3d7`, `4aa4f7b` y `52e7eba` |
+| Adrián Maldonado | Implementó los tipos de atención, la agenda de turnos y la facturación con descuentos y notas de crédito. Incorporó las pruebas automatizadas y la documentación de entrega. En la puesta a punto agregó el cobro de señas y cargos, amplió el menú veterinario y ajustó las reglas de vacunas, facturas y urgencias. | `354f798`, `04c439d` y `51676e6`. Ajustes en el PR #17. |
+| Santiago Coco | Implementó los tipos de fecha y hora y la excepción del dominio. Desarrolló el inventario por lotes, la persistencia de datos y el servicio de notificaciones. | `a861730`, `edef104` y `6e72a5e` |
 
 ## 10. Reflexión del grupo
 
-**Borrador para adaptar a la experiencia real:** el trabajo permitió comprobar que el modelo UML resulta útil como guía, pero que la codificación revela datos y estados que no siempre aparecen en el primer diseño. Mantener separados dominio, controladores, persistencia y presentación simplificó las correcciones y las pruebas. La parte más importante de la puesta a punto fue verificar las reglas con escenarios negativos, especialmente superposición, falta de stock y permisos por rol.
+Al pasar del diagrama al código, tuvimos que precisar cuándo cambia el estado de una entidad y qué datos necesita cada operación. Por ejemplo, distinguir una factura pendiente de una emitida nos permitió separar la confirmación de la consulta del cobro en recepción. La verificación de stock también nos llevó a revisar la consulta completa antes de descontar unidades, para que un faltante no deje el inventario parcialmente modificado.
+
+En la puesta a punto vimos que probar una regla con un solo ejemplo podía ocultar errores. La urgencia funcionaba con un turno de 30 minutos, pero al probar con una vacunación de 15 minutos apareció un problema de superposición. También fue importante probar qué pasa al rechazar una cancelación con cargo y comprobar que el turno siguiera programado. En un próximo trabajo definiríamos estos casos límite al diseñar cada flujo y actualizaríamos el diagrama y las pruebas en el mismo cambio que modifica la regla.

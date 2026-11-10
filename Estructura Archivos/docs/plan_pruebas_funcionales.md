@@ -2,7 +2,7 @@
 
 ## Criterio
 
-Se validan los casos de uso principales y las reglas de negocio más sensibles. Las pruebas funcionales automatizadas se ejecutan con `PruebasFuncionales.java`; los resultados guardados corresponden a una ejecución real posterior a la compilación.
+Se validan los casos de uso principales y las reglas de negocio más sensibles. Las pruebas funcionales automatizadas se ejecutan con `PruebasFuncionales.java`; los 17 casos se volvieron a ejecutar con JDK 17.0.1 sobre el código de saturnito en f0ea70a. El resultado fue de 17 casos correctos y 0 fallidos.
 
 | ID | Caso / regla | Datos de entrada principales | Resultado esperado | Resultado obtenido |
 |---|---|---|---|---|
@@ -26,7 +26,7 @@ Se validan los casos de uso principales y las reglas de negocio más sensibles. 
 
 ## Pruebas unitarias complementarias
 
-Se ejecutaron 35 verificaciones de lógica aislada: fechas bisiestas, día de semana, suma de minutos, descuentos, FIFO, superposición, confirmación, stock, faltantes, autenticación en TXT, creación por defecto, cambio de contraseña, rechazo de duplicados, validación de caracteres prohibidos, conversión lb/kg y reintentos de lectura en consola. Resultado: **35 correctas y 0 fallidas**.
+Se ejecutaron 46 verificaciones unitarias con JDK 17.0.1. Cubren fechas, turnos, señas, facturación, stock, historia clínica, vacunas y validaciones de entrada, entre otras reglas. Resultado: **46 correctas y 0 fallidas**.
 
 ## Evidencia
 

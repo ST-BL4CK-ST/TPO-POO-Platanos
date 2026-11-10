@@ -1,3 +1,5 @@
+Ejecución con JDK 17.0.1 sobre saturnito en f0ea70a.
+
 OK - Fecha bisiesta suma 1 dia
 OK - 02/11/2026 es lunes
 OK - Suma de minutos cambia de dia
@@ -39,4 +41,15 @@ Opcion: Opcion invalida. Debe ser entre 1 y 3.
 Opcion: OK - Reintento de opcion rechaza valores fuera de rango
 Peso: El valor debe ser mayor a cero.
 Peso: Unidad (1=kg 2=lb): OK - Reintento peso rechaza negativo y convierte libras a kg
-RESULTADO: 35 correctas, 0 fallidas
+OK - Cancelar justo en el limite de 2 horas no genera cargo
+OK - Cancelacion tardia con y sin confirmacion
+OK - Tres ausencias exigen sena, pago habilita nueva reserva
+OK - Urgencia desplaza vacunacion de 15 min sin superposicion
+OK - Urgencia desplaza consulta de 30 min sin superposicion
+OK - Urgencia desplaza cirugia de 120 min sin superposicion
+OK - Vacuna antes de la edad minima rechazada
+OK - Recordatorio no se repite tras aplicar refuerzo
+OK - Factura emitida o anulada no admite transiciones invalidas
+OK - Consulta con lotes insuficientes no aplica cambios
+OK - Nota rectificatoria no altera registro original de la consulta
+RESULTADO: 46 correctas, 0 fallidas
